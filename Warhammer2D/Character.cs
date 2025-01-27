@@ -18,8 +18,9 @@ namespace Warhammer2D
         public int health = 100;
         public bool isSelected = false;
         private Form1 parentForm;
+        public bool isPlayer;
 
-        public Character(int x, int y, Bitmap img, int width, Form1 frm)
+        public Character(int x, int y, Bitmap img, int width, bool isplayer, Form1 frm)
         {
             Graphics g;
             image = new PictureBox();
@@ -30,24 +31,32 @@ namespace Warhammer2D
             image.Click += clickEvent;
             parentForm = frm;
             frm.Controls.Add(image);
+            isPlayer = isplayer;
         }
 
         private void clickEvent(object sender, EventArgs e)
         {
-            if (parentForm.currentState != GameState.PlayerMove)
-                return;
-
-            if (isSelected == true)
+            if ((parentForm.currentState == GameState.PlayerMove) || (parentForm.currentState == GameState.PlayerShoot))
             {
-                isSelected = false;
-                parentForm.clearSelected();
-            }
-            else
-            {
-                isSelected = true;
-                parentForm.clearSelected();
-                parentForm.playerSelected = this;
-                image.BorderStyle = BorderStyle.Fixed3D;
+                if (isSelected == true)
+                {
+                    isSelected = false;
+                    parentForm.clearSelected(isPlayer);
+                }
+                else
+                {
+                    isSelected = true;
+                    //parentForm.clearSelected();
+                    parentForm.playerSelected = this;
+                    image.BorderStyle = BorderStyle.Fixed3D;
+                }
+                if (parentForm.currentState == GameState.PlayerShoot)
+                {
+                    if ((isPlayer == false))
+                        parentForm.target = this;
+                    else
+                        parentForm.shooter = this;
+                }
             }
         }
 
@@ -56,14 +65,28 @@ namespace Warhammer2D
             hasMoved = true;
 
             int newx = image.Location.X;
-            int newy = image.Location.Y+ stepSize;
+            int newy = image.Location.Y + stepSize;
             //need to make better just moves down by 1 sqaure
-            while (usedPositions.Contains(new Point(newx,newy)))
+            while (usedPositions.Contains(new Point(newx, newy)))
             {
                 newx = newx;
                 newy = newy + stepSize;
             }
-            image.Location = new Point(newx,newy);
+            image.Location = new Point(newx, newy);
+        }
+
+        public void Shoot(Character target)
+        {
+            if (target != null)
+            {
+                target.health -= 20; // Example damage value
+                if (target.health <= 0)
+                {
+                    target.health = 0;
+                    // Handle character death (e.g., remove from the board)
+                    target.image.Visible = false;
+                }
+            }
         }
     }
 }

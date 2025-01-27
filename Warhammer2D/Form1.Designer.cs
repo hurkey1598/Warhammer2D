@@ -41,6 +41,7 @@
             MinimumSize = new Size(650, 560);
             Name = "Form1";
             Text = "Form1";
+            Load += Form1_Load;
             ResumeLayout(false);
         }
 
