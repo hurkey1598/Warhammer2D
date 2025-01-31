@@ -69,7 +69,6 @@ namespace Warhammer2D
             //need to make better just moves down by 1 sqaure
             while (usedPositions.Contains(new Point(newx, newy)))
             {
-                newx = newx;
                 newy = newy + stepSize;
             }
             image.Location = new Point(newx, newy);
@@ -77,9 +76,10 @@ namespace Warhammer2D
 
         public void Shoot(Character target)
         {
+            
             if (target != null)
             {
-                target.health -= 20; // Example damage value
+                target.health -= 200; // Example damage value
                 if (target.health <= 0)
                 {
                     target.health = 0;
@@ -87,6 +87,8 @@ namespace Warhammer2D
                     target.image.Visible = false;
                 }
             }
+            parentForm.clearSelected(isPlayer);
+            parentForm.clearSelected(isSelected);
         }
     }
 }

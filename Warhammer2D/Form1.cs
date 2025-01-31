@@ -39,7 +39,7 @@ namespace Warhammer2D
         private List<Character> playerChars = new List<Character>();
         private List<Character> enemyChars = new List<Character>();
         private HashSet<Point> mountainPositions = new HashSet<Point>();
-        public Character playerSelected;
+        public Character? playerSelected;
         public GameState currentState = GameState.Setup;
         private int piecesToPlace = 4;
 
@@ -64,8 +64,9 @@ namespace Warhammer2D
         private Button ShootBtn;
         private Button nextPhaseBtn;
 
-        public Character shooter;
-        public Character target;
+        public Character? shooter;
+        public Character? target;
+       
 
         public Form1()
         {
@@ -279,19 +280,19 @@ namespace Warhammer2D
                             c.image.Location = new Point(MX, MY);
                             clearSelected(true);
                         }
+                        ////////////////////////////////////////////// need to create it that it auto moves to shoot phase ///////////////////////////////
                         if (c.hasMoved)
                         {
                             playersMoved++;
-                            if (playersMoved == 4)
+                            if (playersMoved == spaceMarineCount)
                             {
-                                // Switch to enemy move phase
-                                currentState = GameState.EnemyMove;
-                                MoveNecrons();
+                                
                                 // Goes back to PlayerMove phase
                                 TurnendBtn.Enabled = true;
-                                currentState = GameState.PlayerMove;
+                                currentState = GameState.PlayerShoot;
                                 TurnDisplayBox.Text = currentState.ToString();
                                 ResetHumanMove();
+                                return;
                             }
                         }
                     }
@@ -416,30 +417,43 @@ namespace Warhammer2D
             // Ensure there are Space Marines to target
             if (playerChars.Count > 0)
             {
-                // Select a random Space Marine to die
-                int targetIndex = random.Next(playerChars.Count);
-                Character target = playerChars[targetIndex];
-
-                // Remove the target from the playerChars list
-                playerChars.Remove(target);
-
-                // Remove the target's image from the form's controls
-                this.Controls.Remove(target.image);
-
-                // Optionally, you can add some visual or sound effect here to indicate the Space Marine's death
-            }
-
-            /*
-            // Existing enemy shooting logic
-            foreach (Character enemy in enemyChars)
-            {
-                Character target = playerChars.FirstOrDefault(c => c.image.Bounds.IntersectsWith(enemy.image.Bounds));
-                if (target != null)
+                foreach (Character enemy in enemyChars)
                 {
-                    enemy.Shoot(target);
+                    // Find the closest player character within range
+                    Character? target = null;
+                    int minDistance = int.MaxValue;
+
+                    foreach (Character player in playerChars)
+                    {
+                        // Calculate the distance between enemy and player
+                        int dx = Math.Abs(enemy.image.Location.X - player.image.Location.X) / squaresize;
+                        int dy = Math.Abs(enemy.image.Location.Y - player.image.Location.Y) / squaresize;
+                        int distance = dx + dy;
+
+                        // Check if the player is within 5 squares and closer than the current target
+                        if (distance <= 5 && distance < minDistance)
+                        {
+                            target = player;
+                            minDistance = distance;
+                        }
+                    }
+
+                    // If a target is found within range, shoot it
+                    if (target != null)
+                    {
+                        enemy.Shoot(target);
+
+                        // Remove the target from the player list and the form's controls
+                        playerChars.Remove(target);
+                        this.Controls.Remove(target.image);
+                        spaceMarineCount--;
+
+                        // Optionally, you can add some visual or sound effect here to indicate the Space Marine's death
+                    }
                 }
             }
-            */
+            
+            currentState = GameState.PlayerMove;
         }
 
         private void ShootButton()
@@ -459,14 +473,33 @@ namespace Warhammer2D
             if (currentState != GameState.PlayerShoot || playerSelected == null || target == null)
                 return;
 
-            // Assuming shooter is the playerSelected
-            shooter = playerSelected;
 
             if (shooter != null && target != null)
             {
-                shooter.Shoot(target);
-                shooter.hasShot = true;
+                // Check if the shooter has already shot
+                if (shooter.hasShot)
+                {
+                    MessageBox.Show("This unit has already shot this turn", "Shooting Restriction", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    //clearSelected(isThePlayer);
+                    return;
+                }
 
+                // Calculate the distance between shooter and target
+                int dx = Math.Abs(shooter.image.Location.X - target.image.Location.X) / squaresize;
+                int dy = Math.Abs(shooter.image.Location.Y - target.image.Location.Y) / squaresize;
+                int distance = dx + dy;
+
+                // Check if the target is within 5 squares
+                if (distance > 5)
+                {
+                    MessageBox.Show("Target is out of range! You can only shoot enemies within 5 squares.", "Shooting Restriction", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                shooter.Shoot(target);
+                shooter.hasShot = true; // Set hasShot to true after shooting
+
+                
                 // Remove the target from the enemy list and the form's controls
                 enemyChars.Remove(target);
                 this.Controls.Remove(target.image);
@@ -518,6 +551,7 @@ namespace Warhammer2D
             }
             TurnDisplayBox.Text = currentState.ToString();
             this.Invalidate(); // Refresh the form to update UI
+            clearSelected(true);
         }
 
         
