@@ -280,7 +280,6 @@ namespace Warhammer2D
                             c.image.Location = new Point(MX, MY);
                             clearSelected(true);
                         }
-                        ////////////////////////////////////////////// need to create it that it auto moves to shoot phase ///////////////////////////////
                         if (c.hasMoved)
                         {
                             playersMoved++;
