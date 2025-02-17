@@ -34,7 +34,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.PaleGoldenrod;
+            BackColor = Color.Black;
             ClientSize = new Size(632, 513);
             Margin = new Padding(3, 4, 3, 4);
             MaximumSize = new Size(650, 560);

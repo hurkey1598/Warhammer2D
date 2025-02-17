@@ -36,8 +36,8 @@ namespace Warhammer2D
         }
 
         // Player and enemy pieces on the board
-        private List<Character> playerChars = new List<Character>();
-        private List<Character> enemyChars = new List<Character>();
+        public List<Character> playerChars = new List<Character>();
+        public List<Character> enemyChars = new List<Character>();
         private HashSet<Point> mountainPositions = new HashSet<Point>();
         public Character? playerSelected;
         public GameState currentState = GameState.Setup;
@@ -47,8 +47,8 @@ namespace Warhammer2D
         private Random random = new Random();
 
         // Keeps track of how many units there are on both sides
-        private int spaceMarineCount = 0;
-        private int necronCount = 0;
+        public int spaceMarineCount = 0;
+        public int necronCount = 0;
 
         // Variables for grid and UI layout
         private int MX = 10;
@@ -66,7 +66,7 @@ namespace Warhammer2D
 
         public Character? shooter;
         public Character? target;
-       
+
 
         public Form1()
         {
@@ -81,7 +81,8 @@ namespace Warhammer2D
                 Text = "End Setup",
                 Size = new Size(100, 30),
                 Location = new Point(highwidth * squaresize + 20, 10),
-                Enabled = false
+                Enabled = false,
+                BackColor = Color.Transparent
             };
             SetupendBtn.Click += SetupEndBtn_Click;
             this.Controls.Add(SetupendBtn);
@@ -96,7 +97,8 @@ namespace Warhammer2D
                 Size = new Size(100, 30),
                 Location = new Point(highwidth * squaresize + 20, 10),
                 Enabled = false,
-                Visible = false
+                Visible = false,
+                BackColor = Color.Transparent
             };
             TurnendBtn.Click += EndTurnBtn_Click;
             this.Controls.Add(TurnendBtn);
@@ -141,6 +143,7 @@ namespace Warhammer2D
             SetupendBtn.Visible = false;
             TurnendBtn.Visible = true;
             TurnendBtn.Enabled = true;
+
             TurnDisplayBox.Text = currentState.ToString();
             nextPhaseBtn.Visible = true;
         }
@@ -158,9 +161,11 @@ namespace Warhammer2D
 
             // Goes back to PlayerMove phase
             TurnendBtn.Enabled = true;
+            ResetHumanMove();
+            ResetHumanShoot();
             currentState = GameState.PlayerMove;
             TurnDisplayBox.Text = currentState.ToString();
-            ResetHumanMove();
+            
         }
 
         private void MoveNecrons()
@@ -179,7 +184,9 @@ namespace Warhammer2D
                 c.CPUmove(usedPositions, squaresize);
             }
             currentState = GameState.EnemyShoot;
+
             EnemyShoot();
+            ResetHumanShoot();
         }
 
         public void clearSelected(bool isThePlayer)
@@ -289,6 +296,7 @@ namespace Warhammer2D
                                 // Goes back to PlayerMove phase
                                 TurnendBtn.Enabled = true;
                                 currentState = GameState.PlayerShoot;
+                                ShootBtn.Enabled = true;
                                 TurnDisplayBox.Text = currentState.ToString();
                                 ResetHumanMove();
                                 return;
@@ -374,7 +382,8 @@ namespace Warhammer2D
                     Size = new Size(squaresize - 2, squaresize - 2),
                     Location = mountainLocation,
                     SizeMode = PictureBoxSizeMode.StretchImage,
-                    Image = Properties.Resources.mountain_pixel_removebg_preview
+                    Image = Properties.Resources.mountain_pixel_removebg_preview,
+                    BackColor = Color.Transparent
                 };
                 this.Controls.Add(mountain);
             }
@@ -407,6 +416,14 @@ namespace Warhammer2D
             foreach (Character c in playerChars)
             {
                 c.hasMoved = false;
+            }
+        }
+
+       private void ResetHumanShoot()
+        {
+            foreach (Character c in playerChars)
+            {
+                c.hasShot = false;
             }
         }
 
@@ -461,6 +478,7 @@ namespace Warhammer2D
             ShootBtn.Text = "Shoot";
             ShootBtn.Size = new Size(100, 30);
             ShootBtn.Location = new Point(highwidth * squaresize + 20, 60);
+            ShootBtn.BackColor = Color.Transparent;
             ShootBtn.Click += ShootBtn_Click;
             ShootBtn.Enabled = false;
 
@@ -479,7 +497,6 @@ namespace Warhammer2D
                 if (shooter.hasShot)
                 {
                     MessageBox.Show("This unit has already shot this turn", "Shooting Restriction", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    //clearSelected(isThePlayer);
                     return;
                 }
 
@@ -509,7 +526,7 @@ namespace Warhammer2D
                 TurnDisplayBox.Text = currentState.ToString();
                 this.Invalidate(); // Refresh the form to update UI
             }
-        }
+            }
         
 
         private void NextPhaseButton()
@@ -520,6 +537,7 @@ namespace Warhammer2D
             nextPhaseBtn.Location = new Point(highwidth * squaresize + 20, 100);
             nextPhaseBtn.Enabled = true;
             nextPhaseBtn.Visible = false;
+            nextPhaseBtn.BackColor = Color.Transparent;
             nextPhaseBtn.Click += NextPhaseBtn_Click;
             this.Controls.Add(nextPhaseBtn);
         }
@@ -551,6 +569,35 @@ namespace Warhammer2D
             TurnDisplayBox.Text = currentState.ToString();
             this.Invalidate(); // Refresh the form to update UI
             clearSelected(true);
+        }
+        public void ResetGame()
+        {
+            // Clear all characters from the board
+            foreach (var character in playerChars)
+            {
+                this.Controls.Remove(character.image);
+            }
+            foreach (var character in enemyChars)
+            {
+                this.Controls.Remove(character.image);
+            }
+            playerChars.Clear();
+            enemyChars.Clear();
+            spaceMarineCount = 0;
+            necronCount = 0;
+
+            // Reset game state
+            currentState = GameState.Setup;
+            piecesToPlace = 4;
+            SetupendBtn.Visible = true;
+            SetupendBtn.Enabled = false;
+            TurnendBtn.Visible = false;
+            nextPhaseBtn.Visible = false;
+            TurnDisplayBox.Text = currentState.ToString();
+
+            // Place initial mountains and Necrons on the board
+            PlaceMountains(3);
+            PlaceNecrons(5);
         }
 
         

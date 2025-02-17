@@ -63,6 +63,16 @@ namespace Warhammer2D.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap grimdark_background {
+            get {
+                object obj = ResourceManager.GetObject("grimdark background", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap mountain_pixel_removebg_preview {
             get {
                 object obj = ResourceManager.GetObject("mountain_pixel-removebg-preview", resourceCulture);
@@ -96,6 +106,16 @@ namespace Warhammer2D.Properties {
         internal static System.Drawing.Bitmap ultramarine_logo {
             get {
                 object obj = ResourceManager.GetObject("ultramarine logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap warhammer_40k_ultramarines_chapter_wallpaper_by_manyueru_dae5wer_3130276991 {
+            get {
+                object obj = ResourceManager.GetObject("warhammer_40k_ultramarines_chapter_wallpaper_by_manyueru-dae5wer-3130276991", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
