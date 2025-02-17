@@ -71,6 +71,8 @@ namespace Warhammer2D
         public Form1()
         {
             InitializeComponent();
+            this.AutoScaleMode = AutoScaleMode.Dpi;
+            this.AutoScaleDimensions = new SizeF(82f, 74.5f); 
         }
 
         // Creates and configures the "End Setup" button

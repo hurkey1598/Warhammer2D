@@ -32,13 +32,12 @@
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Black;
-            ClientSize = new Size(632, 513);
-            Margin = new Padding(3, 4, 3, 4);
-            MaximumSize = new Size(650, 560);
-            MinimumSize = new Size(650, 560);
+            ClientSize = new Size(555, 391);
+            MaximumSize = new Size(571, 430);
+            MinimumSize = new Size(571, 430);
             Name = "Form1";
             Text = "Form1";
             Load += Form1_Load;
