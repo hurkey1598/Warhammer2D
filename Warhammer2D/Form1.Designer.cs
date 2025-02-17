@@ -34,7 +34,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.Black;
+            BackColor = Color.White;
             ClientSize = new Size(555, 391);
             MaximumSize = new Size(571, 430);
             MinimumSize = new Size(571, 430);

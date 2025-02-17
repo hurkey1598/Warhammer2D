@@ -28,7 +28,7 @@ namespace Warhammer2D
             NextPhaseButton();
 
             // Place initial mountains and Necrons on the board
-            PlaceMountains(3);
+            PlaceMountains(4);
             PlaceNecrons(5); // maximum 15 or game crashes
 
             TurnDisplay();
@@ -71,6 +71,8 @@ namespace Warhammer2D
         public Form1()
         {
             InitializeComponent();
+
+            //Fix for a scaling issue between devices
             this.AutoScaleMode = AutoScaleMode.Dpi;
             this.AutoScaleDimensions = new SizeF(82f, 74.5f); 
         }
@@ -219,7 +221,7 @@ namespace Warhammer2D
             if (currentState == GameState.Setup)
             {
                 // Allow placing players only in the last two rows
-                if (MY >= ((highwidth - 2) * squaresize) && MX < 500)
+                if (MY >= ((highwidth - 2) * squaresize) && MX < 500 && MY < 500)
                 {
                     piecesToPlace--;
                     // Enable the "End Setup" button once all pieces are placed
@@ -349,7 +351,7 @@ namespace Warhammer2D
             }
 
             // Highlight placement area during setup
-            if (currentState == GameState.Setup && MX < 500)
+            if (currentState == GameState.Setup && MX < 500 && MY < 500)
             {
                 e.Graphics.DrawRectangle(Pens.Green, MX, MY, squaresize, squaresize);
             }
