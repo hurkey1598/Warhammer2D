@@ -350,8 +350,7 @@ namespace Warhammer2D
                 e.Graphics.DrawLine(Pens.Red, 0, i * squaresize, squaresize * highwidth, i * squaresize);
             }
 
-            // Highlight placement area during setup
-            if (currentState == GameState.Setup && MX < 500 && MY < 500)
+            if ( MX < 500 && MY < 500)
             {
                 e.Graphics.DrawRectangle(Pens.Green, MX, MY, squaresize, squaresize);
             }
