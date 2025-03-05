@@ -28,8 +28,8 @@ namespace Warhammer2D
             NextPhaseButton();
 
             // Place initial mountains and Necrons on the board
-            PlaceMountains(4);
-            PlaceNecrons(5); // maximum 15 or game crashes
+            PlaceMountains(6);
+            PlaceNecrons(4); // maximum 15 or game crashes
 
             TurnDisplay();
 
@@ -41,7 +41,7 @@ namespace Warhammer2D
         private HashSet<Point> mountainPositions = new HashSet<Point>();
         public Character? playerSelected;
         public GameState currentState = GameState.Setup;
-        private int piecesToPlace = 4;
+        private int piecesToPlace = 5;
 
         // Random number generator for generating positions for enemies start
         private Random random = new Random();
@@ -66,15 +66,14 @@ namespace Warhammer2D
 
         public Character? shooter;
         public Character? target;
+        public int score = 0;
+        
 
 
         public Form1()
         {
             InitializeComponent();
-
-            //Fix for a scaling issue between devices
-            this.AutoScaleMode = AutoScaleMode.Dpi;
-            this.AutoScaleDimensions = new SizeF(82f, 74.5f); 
+                      
         }
 
         // Creates and configures the "End Setup" button
@@ -467,11 +466,18 @@ namespace Warhammer2D
                         this.Controls.Remove(target.image);
                         spaceMarineCount--;
 
-                        // Optionally, you can add some visual or sound effect here to indicate the Space Marine's death
+                        // Check if all player units are dead
+                        if (playerChars.Count == 0)
+                        {
+                            ShowLoseScreen();
+                            return;
+                        }
+
+                        
                     }
                 }
             }
-            
+
             currentState = GameState.PlayerMove;
         }
 
@@ -588,10 +594,11 @@ namespace Warhammer2D
             enemyChars.Clear();
             spaceMarineCount = 0;
             necronCount = 0;
+            score++;
 
             // Reset game state
             currentState = GameState.Setup;
-            piecesToPlace = 4;
+            piecesToPlace = 5;
             SetupendBtn.Visible = true;
             SetupendBtn.Enabled = false;
             TurnendBtn.Visible = false;
@@ -599,10 +606,29 @@ namespace Warhammer2D
             TurnDisplayBox.Text = currentState.ToString();
 
             // Place initial mountains and Necrons on the board
-            PlaceMountains(3);
-            PlaceNecrons(5);
+            PlaceMountains(6);
+            PlaceNecrons(4);
         }
 
-        
+        private void WriteScoreToFile(int score)
+        {
+            string filePath = "scores.txt";
+            StreamWriter writer = new StreamWriter(filePath, true);
+            writer.WriteLine(score);
+            writer.Close();
+        }
+        private void ShowLoseScreen()
+        {
+            WriteScoreToFile(score);
+            MessageBox.Show("You Lose!", "Game Over", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            this.Hide();
+            Form2 form2 = new Form2(score);
+            form2.Show();
+        }
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            WriteScoreToFile(score);
+        }
+
     }
 }

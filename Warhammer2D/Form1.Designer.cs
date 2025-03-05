@@ -32,14 +32,16 @@
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(555, 391);
-            MaximumSize = new Size(571, 430);
-            MinimumSize = new Size(571, 430);
+            ClientSize = new Size(632, 511);
+            Margin = new Padding(3, 4, 3, 4);
+            MaximumSize = new Size(650, 558);
+            MinimumSize = new Size(650, 558);
             Name = "Form1";
             Text = "Form1";
+            FormClosed += Form1_FormClosed;
             Load += Form1_Load;
             ResumeLayout(false);
         }

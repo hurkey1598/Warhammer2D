@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             button1 = new Button();
-            label1 = new Label();
+            HighScore = new Label();
             pictureBox1 = new PictureBox();
             button2 = new Button();
             button3 = new Button();
@@ -49,15 +49,15 @@
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
             // 
-            // label1
+            // HighScore
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Showcard Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(12, 193);
-            label1.Name = "label1";
-            label1.Size = new Size(121, 23);
-            label1.TabIndex = 3;
-            label1.Text = "High score:";
+            HighScore.AutoSize = true;
+            HighScore.Font = new Font("Showcard Gothic", 10.8F, FontStyle.Regular, GraphicsUnit.Point);
+            HighScore.Location = new Point(12, 193);
+            HighScore.Name = "HighScore";
+            HighScore.Size = new Size(121, 23);
+            HighScore.TabIndex = 3;
+            HighScore.Text = "High score:";
             // 
             // pictureBox1
             // 
@@ -103,7 +103,7 @@
             Controls.Add(button3);
             Controls.Add(button2);
             Controls.Add(pictureBox1);
-            Controls.Add(label1);
+            Controls.Add(HighScore);
             Controls.Add(button1);
             MaximizeBox = false;
             MaximumSize = new Size(571, 271);
@@ -119,7 +119,7 @@
         #endregion
 
         private Button button1;
-        private Label label1;
+        private Label HighScore;
         private PictureBox pictureBox1;
         private Button button2;
         private Button button3;
