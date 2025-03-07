@@ -22,12 +22,13 @@ namespace Warhammer2D
             int highestScore = GetHighestScore();
             HighScore.Text = ("High Score: " + highestScore.ToString());
 
-            form1 = new Form1();
-            form1.FormClosed += Form1_FormClosed;
+            
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            form1 = new Form1();
+            form1.FormClosed += Form1_FormClosed;
             form1.Show();
             this.Hide();
         }

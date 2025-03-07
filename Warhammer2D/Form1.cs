@@ -21,15 +21,16 @@ namespace Warhammer2D
             this.Paint += GridLines;
             this.MouseMove += MouseMoved;
 
-            // Initialize setup and turn buttons
+            // Initialize setup and buttons
             SetupEndButton();
             EndTurnButton();
             ShootButton();
             NextPhaseButton();
+            SetupDiceBox();
 
             // Place initial mountains and Necrons on the board
-            PlaceMountains(6);
-            PlaceNecrons(4); // maximum 15 or game crashes
+            PlaceMountains(12);
+            PlaceNecrons(4 + level); // maximum 27 or game has risk of crashing crashes
 
             TurnDisplay();
 
@@ -54,8 +55,9 @@ namespace Warhammer2D
         private int MX = 10;
         private int MY = 10;
         private int squaresize = 50;
-        private int highwidth = 10;
+        private int highwidth = 15;
         private Rectangle[] boxes;
+        private int level = 0;
 
         // Items on screen
         private Button SetupendBtn;
@@ -67,7 +69,8 @@ namespace Warhammer2D
         public Character? shooter;
         public Character? target;
         public int score = 0;
-        
+        public int dice = 0;
+        private TextBox DiceBox;
 
 
         public Form1()
@@ -220,7 +223,7 @@ namespace Warhammer2D
             if (currentState == GameState.Setup)
             {
                 // Allow placing players only in the last two rows
-                if (MY >= ((highwidth - 2) * squaresize) && MX < 500 && MY < 500)
+                if (MY >= ((highwidth - 2) * squaresize) && MX < 750 && MY < 750)
                 {
                     piecesToPlace--;
                     // Enable the "End Setup" button once all pieces are placed
@@ -284,27 +287,31 @@ namespace Warhammer2D
                     int playersMoved = 0;
                     foreach (Character c in playerChars)
                     {
-                        if (c == playerSelected)
+                        if (MX <= 750 && MY <= 750)
                         {
-                            c.hasMoved = true;
-                            c.image.Location = new Point(MX, MY);
-                            clearSelected(true);
-                        }
-                        if (c.hasMoved)
-                        {
-                            playersMoved++;
-                            if (playersMoved == spaceMarineCount)
+                            if (c == playerSelected)
                             {
-                                
-                                // Goes back to PlayerMove phase
-                                TurnendBtn.Enabled = true;
-                                currentState = GameState.PlayerShoot;
-                                ShootBtn.Enabled = true;
-                                TurnDisplayBox.Text = currentState.ToString();
-                                ResetHumanMove();
-                                return;
+                                c.hasMoved = true;
+                                c.image.Location = new Point(MX, MY);
+                                clearSelected(true);
+                            }
+                            if (c.hasMoved)
+                            {
+                                playersMoved++;
+                                if (playersMoved == spaceMarineCount)
+                                {
+
+                                    // Goes back to PlayerMove phase
+                                    TurnendBtn.Enabled = true;
+                                    currentState = GameState.PlayerShoot;
+                                    ShootBtn.Enabled = true;
+                                    TurnDisplayBox.Text = currentState.ToString();
+                                    ResetHumanMove();
+                                    return;
+                                }
                             }
                         }
+                        
                     }
                     playerSelected = null;
                 }
@@ -349,7 +356,7 @@ namespace Warhammer2D
                 e.Graphics.DrawLine(Pens.Red, 0, i * squaresize, squaresize * highwidth, i * squaresize);
             }
 
-            if ( MX < 500 && MY < 500)
+            if ( MX < 750 && MY < 750)
             {
                 e.Graphics.DrawRectangle(Pens.Green, MX, MY, squaresize, squaresize);
             }
@@ -421,7 +428,9 @@ namespace Warhammer2D
             }
         }
 
-       private void ResetHumanShoot()
+        //////////// Shooting and Shooting button /////////////
+
+        private void ResetHumanShoot()
         {
             foreach (Character c in playerChars)
             {
@@ -464,7 +473,7 @@ namespace Warhammer2D
                         // Remove the target from the player list and the form's controls
                         playerChars.Remove(target);
                         this.Controls.Remove(target.image);
-                        spaceMarineCount--;
+                        
 
                         // Check if all player units are dead
                         if (playerChars.Count == 0)
@@ -494,49 +503,91 @@ namespace Warhammer2D
             this.Controls.Add(ShootBtn);
         }
 
+        private void DiceRoll()
+        {
+            Random rnd = new Random();
+            dice = rnd.Next(1, 7);
+            DiceBox.Text = dice.ToString();
+        }
+
+        
         private void ShootBtn_Click(object sender, EventArgs e)
         {
+            
             if (currentState != GameState.PlayerShoot || playerSelected == null || target == null)
-                return;
-
-
-            if (shooter != null && target != null)
             {
-                // Check if the shooter has already shot
+                return;
+            }
+
+            DiceRoll();
+
+            if (dice >= 3)
+            {
+                if (shooter != null && target != null)
+                {
+
+                    // Check if the shooter has already shot
+                    if (shooter.hasShot)
+                    {
+                        MessageBox.Show("This unit has already shot this turn", "Shooting Restriction", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // Calculate the distance between shooter and target
+                    int dx = Math.Abs(shooter.image.Location.X - target.image.Location.X) / squaresize;
+                    int dy = Math.Abs(shooter.image.Location.Y - target.image.Location.Y) / squaresize;
+                    int distance = dx + dy;
+
+                    // Check if the target is within 5 squares
+                    if (distance > 5)
+                    {
+                        MessageBox.Show("Target is out of range! You can only shoot enemies within 5 squares.", "Shooting Restriction", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+
+                    shooter.Shoot(target);
+                    shooter.hasShot = true; // Set hasShot to true after shooting
+
+
+                    // Remove the target from the enemy list and the form's controls
+                    enemyChars.Remove(target);
+                    this.Controls.Remove(target.image);
+
+                    // Reset the target
+                    target = null;
+
+                    TurnDisplayBox.Text = currentState.ToString();
+                    this.Invalidate(); // Refresh the form to update UI
+                }
+            }
+            if (dice < 3) 
+            {
+                MessageBox.Show("You missed", "Shooting missed", MessageBoxButtons.OK);
+                shooter.hasShot = true; // Set hasShot to true after shooting
+                target = null;
+                TurnDisplayBox.Text = currentState.ToString();
+
                 if (shooter.hasShot)
                 {
                     MessageBox.Show("This unit has already shot this turn", "Shooting Restriction", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
-
-                // Calculate the distance between shooter and target
-                int dx = Math.Abs(shooter.image.Location.X - target.image.Location.X) / squaresize;
-                int dy = Math.Abs(shooter.image.Location.Y - target.image.Location.Y) / squaresize;
-                int distance = dx + dy;
-
-                // Check if the target is within 5 squares
-                if (distance > 5)
-                {
-                    MessageBox.Show("Target is out of range! You can only shoot enemies within 5 squares.", "Shooting Restriction", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                shooter.Shoot(target);
-                shooter.hasShot = true; // Set hasShot to true after shooting
-
-                
-                // Remove the target from the enemy list and the form's controls
-                enemyChars.Remove(target);
-                this.Controls.Remove(target.image);
-
-                // Reset the target
-                target = null;
-
-                TurnDisplayBox.Text = currentState.ToString();
-                this.Invalidate(); // Refresh the form to update UI
             }
-            }
-        
+        }
+
+        private void SetupDiceBox()
+        {
+            DiceBox = new TextBox();
+            DiceBox.Size = new Size(100, 50);
+            DiceBox.Location = new Point(highwidth * squaresize + 20, 200);
+            DiceBox.TextAlign = HorizontalAlignment.Center;
+            DiceBox.Text = dice.ToString();
+            DiceBox.Enabled = false;
+            this.Controls.Add(DiceBox);
+        }
+
+        //////////// Next Phase Button /////////////
 
         private void NextPhaseButton()
         {
@@ -561,9 +612,11 @@ namespace Warhammer2D
                 case GameState.PlayerMove:
                     currentState = GameState.PlayerShoot;
                     ShootBtn.Enabled =true;
+                    ResetHumanMove();
                     break;
                 case GameState.PlayerShoot:
                     currentState = GameState.EnemyMove;
+                    ResetHumanMove();
                     MoveNecrons();
                     break;
                 case GameState.EnemyMove:
@@ -579,6 +632,8 @@ namespace Warhammer2D
             this.Invalidate(); // Refresh the form to update UI
             clearSelected(true);
         }
+
+        /////////////// Win and lose conditions + Scoring///////////////
         public void ResetGame()
         {
             // Clear all characters from the board
@@ -595,6 +650,7 @@ namespace Warhammer2D
             spaceMarineCount = 0;
             necronCount = 0;
             score++;
+            level++;
 
             // Reset game state
             currentState = GameState.Setup;
@@ -606,8 +662,8 @@ namespace Warhammer2D
             TurnDisplayBox.Text = currentState.ToString();
 
             // Place initial mountains and Necrons on the board
-            PlaceMountains(6);
-            PlaceNecrons(4);
+            PlaceMountains(12);
+            PlaceNecrons(4+ level);
         }
 
         private void WriteScoreToFile(int score)
@@ -629,6 +685,7 @@ namespace Warhammer2D
         {
             WriteScoreToFile(score);
         }
+
 
     }
 }

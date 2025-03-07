@@ -32,13 +32,12 @@
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(120F, 120F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             BackColor = Color.White;
-            ClientSize = new Size(632, 511);
+            ClientSize = new Size(902, 769);
             Margin = new Padding(3, 4, 3, 4);
-            MaximumSize = new Size(650, 558);
-            MinimumSize = new Size(650, 558);
+            MaximizeBox = false;
             Name = "Form1";
             Text = "Form1";
             FormClosed += Form1_FormClosed;

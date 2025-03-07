@@ -72,7 +72,7 @@ namespace Warhammer2D
             int newx = image.Location.X;
             int newy = image.Location.Y + stepSize;
 
-            if (newy < 500)
+            if (newy < 750)
             {
                 //need to make better just moves down by 1 sqaure
                 while (usedPositions.Contains(new Point(newx, newy)))
@@ -102,10 +102,7 @@ namespace Warhammer2D
                     {
                         parentForm.playerChars.Remove(target);
                         parentForm.spaceMarineCount--;
-                        if (parentForm.spaceMarineCount == 0)
-                        {
-                            Application.Exit();
-                        }
+                        
                     }
                     else
                     {
